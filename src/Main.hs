@@ -11,9 +11,17 @@ nonLivingFilter = filterAdjacent notElem
 
 getLivingAdjacents = livingFilter . getPossibleAdjacent
 
+livingAdjacentCount x xs = length $ getLivingAdjacents x xs
+
 getNonlivingAdjacents = nonLivingFilter . getPossibleAdjacent
 
+nonlivingAdjacentCount x xs = length $ getNonlivingAdjacents x xs
 
+
+newSet x = remainingLiveCells ++ spawnedDeadCells
+      where 
+         remainingLiveCells = [x' | x' <- x, (livingAdjacentCount x' x) > 2 && (livingAdjacentCount x' x) <= 3]
+         spawnedDeadCells = [x' | x' <- x, (nonlivingAdjacentCount x' x) == 3]
 
 main :: IO ()
-main = putStrLn "hello"
+main = putStrLn "hellojkk"
