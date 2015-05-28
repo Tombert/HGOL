@@ -40,10 +40,12 @@ main :: IO ()
 main = do
   (_progName, _args) <- getArgsAndInitialize 
   _window <- createWindow "Hello World"
+  windowSize $= Size 640 480
   world <- newIORef [(3,1),(2,1), (1,1),(3,2),(2,3)]
   scaledWorld <- newIORef []
   displayCallback $= display scaledWorld
   idleCallback $= Just (idle world scaledWorld)
+  reshapeCallback $= Just reshape 
   mainLoop
 
 -- OpenGL likes your plain being from 0 to 1, but I ws using integers to store the values.  
@@ -55,8 +57,13 @@ display scaledWorld = do
   clear [ColorBuffer]
   x <- get scaledWorld
   renderPrimitive Points $ 
-    mapM_ (\(x,y) -> vertex $ Vertex3 (x/256.0) (y/256.0) 0) x
+    mapM_ (\(x,y) -> vertex $ Vertex3 (x/100.0) (y/100.0) 0) x
   flush
+
+reshape :: ReshapeCallback
+reshape size = do
+  viewport $= (Position 0 0, size)
+  postRedisplay Nothing
  
 idle :: IORef [(Integer, Integer)] -> IORef [(GLfloat, GLfloat)] -> IdleCallback
 idle world scaledWorld = do
@@ -65,4 +72,5 @@ idle world scaledWorld = do
    let sw = scaleWorld newWorld 
    writeIORef world newWorld
    writeIORef scaledWorld sw
+   addTimerCallback (1000 `div` 1) (do postRedisplay Nothing)
    postRedisplay Nothing
