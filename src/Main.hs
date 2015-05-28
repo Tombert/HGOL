@@ -46,6 +46,8 @@ main = do
   idleCallback $= Just (idle world scaledWorld)
   mainLoop
 
+-- OpenGL likes your plane being from 0 to 1, but I ws using integers to store the values.  
+-- This function just makes sure that the values are in the right format. 
 scaleWorld = map ( \(x,y) -> ((fromIntegral x :: GLfloat), (fromIntegral y :: GLfloat)))
 
 display :: IORef [(GLfloat,GLfloat)] -> DisplayCallback
