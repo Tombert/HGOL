@@ -1,5 +1,7 @@
 module Main where 
-
+import Data.IORef
+import Graphics.UI.GLUT
+import Control.Monad
 
 --unique :: [Int] -> [Int]
 unique xs = [x | (x,y) <- zip xs [0..], x `notElem` (take y xs)]
@@ -30,5 +32,35 @@ newSet x = remainingLiveCells ++ (unique spawnedDeadCells)
          remainingLiveCells = [x' | x' <- x, (livingAdjacentCount x' x) == 2 || (livingAdjacentCount x' x) == 3]
          spawnedDeadCells = [y' | x' <- x, y' <- (getNonlivingAdjacents x' x), (livingAdjacentCount y' x) == 3]
 
+
+
+-- OpenGL stuff
+
 main :: IO ()
-main = putStrLn "hellojkk"
+main = do
+  (_progName, _args) <- getArgsAndInitialize 
+  _window <- createWindow "Hello World"
+  world <- newIORef [(3,1),(2,1), (1,1),(3,2),(2,3)]
+  scaledWorld <- newIORef []
+  displayCallback $= display scaledWorld
+  idleCallback $= Just (idle world scaledWorld)
+  mainLoop
+
+scaleWorld = map ( \(x,y) -> ((fromIntegral x :: GLfloat), (fromIntegral y :: GLfloat)))
+
+display :: IORef [(GLfloat,GLfloat)] -> DisplayCallback
+display scaledWorld = do
+  clear [ColorBuffer]
+  x <- get scaledWorld
+  renderPrimitive Points $ 
+    mapM_ (\(x,y) -> vertex $ Vertex3 (x/256.0) (y/256.0) 0) x
+  flush
+ 
+idle :: IORef [(Integer, Integer)] -> IORef [(GLfloat, GLfloat)] -> IdleCallback
+idle world scaledWorld = do
+   w <- get world
+   let newWorld = newSet w
+   let sw = scaleWorld newWorld 
+   writeIORef world newWorld
+   writeIORef scaledWorld sw
+   postRedisplay Nothing
