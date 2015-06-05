@@ -15,6 +15,8 @@ getPossibleAdjacent (x,y) = [(xa, ya) | xa <- [(x-1)..(x+1)], ya <- [(y-1)..(y+1
 filterAdjacent :: (Integral a) => ((a,a) -> [(a,a)] -> Bool) -> [(a, a)] -> [(a,a)] -> [(a,a)]
 filterAdjacent f x y = [ x' | x' <- x, f x' y]
 
+-- Let's partially apply our utility functions. This will allow us to have a handy function to grab living and 
+-- nonliving cells in the list grid. 
 livingFilter = filterAdjacent elem
 nonLivingFilter = filterAdjacent notElem
 
