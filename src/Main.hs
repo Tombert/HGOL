@@ -28,7 +28,9 @@ getNonlivingAdjacents = nonLivingFilter . getPossibleAdjacent
 
 nonlivingAdjacentCount x xs = length $ getNonlivingAdjacents x xs
 
-
+-- This function is where the new-world is calculated.  We apply conway's logic here by employing two 
+-- list comprehensions.  This will tell whether or not a cell should be included in the new world.  Since 
+-- the order of the cells doesn't really matter here, we can just concat the two comprehensions together. 
 newSet x = remainingLiveCells ++ (unique spawnedDeadCells)
       where 
          remainingLiveCells = [x' | x' <- x, (livingAdjacentCount x' x) == 2 || (livingAdjacentCount x' x) == 3]
@@ -61,6 +63,7 @@ display scaledWorld = do
   renderPrimitive Points $ 
     mapM_ (\(x,y) -> vertex $ Vertex3 (x/100.0) (y/100.0) 0) x
   flush
+
 
 reshape :: ReshapeCallback
 reshape size = do
